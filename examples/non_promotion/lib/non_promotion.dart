@@ -1,9 +1,12 @@
 // ignore_for_file: expected_executable, missing_statement
 // ignore_for_file: unused_local_variable, unused_element
 // ignore_for_file: prefer_function_declarations_over_variables
-// #docregion not-field
+// #docregion not-field, getter-name
 import 'dart:math';
-// #enddocregion not-field
+// #enddocregion not-field, getter-name
+// #docregion mock
+import 'package:mockito/mockito.dart';
+// #enddocregion mock
 
 class C1 {
   int? i;
@@ -87,8 +90,6 @@ void miscDeclAnalyzedButNotTested() {
 
   {
     void f(int? i, int? j) {
-      // #docregion catch-null-check
-      // #enddocregion catch-null-check
       if (i == null) return;
       try {
         i = j; // (1)
@@ -96,6 +97,7 @@ void miscDeclAnalyzedButNotTested() {
         if (i == null) return; // (2)
         // ... Additional code ...
         // #docregion catch-null-check
+        // ...
       } catch (e) {
         if (i != null) {
           print(i.isEven); // (3) OK due to the null check in the line above.
@@ -109,8 +111,6 @@ void miscDeclAnalyzedButNotTested() {
 
   {
     void f(int? i, int? j) {
-      // #docregion catch-bang
-      // #enddocregion catch-bang
       if (i == null) return;
       try {
         i = j; // (1)
@@ -118,6 +118,7 @@ void miscDeclAnalyzedButNotTested() {
         if (i == null) return; // (2)
         // ... Additional code ...
         // #docregion catch-bang
+        // ...
       } catch (e) {
         print(i!.isEven); // (3) OK because of the `!`.
       }
@@ -255,13 +256,14 @@ extension E on int? {
 }
 // #enddocregion this
 
-// #docregion private
+// #docregion private, unrelated, mock
 class A {
   final int? _n;
   A(this._n);
 }
+// #enddocregion unrelated, mock
 
-test(A a) {
+testA(A a) {
   if (a._n != null) {
     print(a._n + 1); // OK
   }
@@ -286,7 +288,7 @@ abstract class B {
   int? get _i => Random().nextBool() ? 123 : null;
 }
 
-f(B b) {
+testB(B b) {
   final i = b._i;
   if (i != null) {
     print(i.isEven); // OK
@@ -307,6 +309,65 @@ class Ext {
 }
 // #enddocregion external
 
-// #docregion 
+// #docregion getter-name, field-name
+class D {
+  final int? _overridden;
+  D(this._overridden);
+}
+// #enddocregion field-name
 
-// #enddocregion 
+class Override implements D {
+  @override
+  int? get _overridden => Random().nextBool() ? 1 : null;
+}
+
+testD(D x) {
+  final i = x._overridden;
+  if (i != null) {
+    print(i.isEven); // OK
+  }
+}
+// #enddocregion getter-name
+
+// #docregion unrelated
+class Unrelated {
+  int? get _j => Random().nextBool() ? 1 : null;
+}
+
+f(A a) {
+  if (a._n != null) {
+    int i = a._n; // OK
+  }
+}
+// #enddocregion unrelated
+
+// #docregion field-name
+class Override2 implements D {
+  @override
+  int? _overridden;
+}
+
+test2(D x) {
+  final i = x._overridden;
+  if (i != null) {
+    print(i.isEven); // ERROR
+  }
+}
+// #enddocregion field-name
+
+// #docregion mock
+class MockExample extends Mock implements A {
+  @override
+  late final int? _n; // Add a definition for Example's _i getter.
+}
+
+testMock(A x) {
+  if (x._n != null) {
+    int i = x._n; // OK
+  }
+}
+// #enddocregion mock
+
+// #docregion
+
+// #enddocregion

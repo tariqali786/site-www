@@ -7,3 +7,5 @@ environment:
 
 dev_dependencies:
   lints: ^3.0.0
+dependencies:
+  mockito: ^5.4.3

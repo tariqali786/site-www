@@ -195,11 +195,11 @@ extension E on int? {
 Create a local variable to hold the value of `this`, then perform the null check.
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (this)" replace="/final.*/[!$&!]/g"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (this)">
 ```dart
 extension E on int? {
   int get valueOrZero {
-    [!final self = this;!]
+    final self = this;
     return self == null ? 0 : self;
   }
 }
@@ -244,14 +244,14 @@ Making the field private lets the compiler be sure that no outside libraries
 could possibly override its value, so it's safe to promote.
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (private)" replace="/final.*/[!$&!]/g"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (private)">
 ```dart
 class A {
-  [!final int? _n;!]
+  final int? _n;
   A(this._n);
 }
 
-test(A a) {
+testA(A a) {
   if (a._n != null) {
     print(a._n + 1); // OK
   }
@@ -346,7 +346,7 @@ f(C c) {
 Assign the getter to a local variable:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (not-field)" replace="/final.*/[!$&!]/g"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (not-field)">
 ```dart
 import 'dart:math';
 // ···
@@ -354,8 +354,8 @@ abstract class B {
   int? get _i => Random().nextBool() ? 123 : null;
 }
 
-f(B b) {
-  [!final i = b._i;!]
+testB(B b) {
+  final i = b._i;
   if (i != null) {
     print(i.isEven); // OK
   }
@@ -409,13 +409,13 @@ class C {
 Assign the external field's value to a local variable:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (external)" replace="/final.*/[!$&!]/g"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (external)">
 ```dart
 class Ext {
-  external [!final int? _externalField;!]
+  external final int? _externalField;
 
   f() {
-    [!final i = this._externalField;!]
+    final i = this._externalField;
     if (i != null) {
       print(i.isEven); // OK
     }
@@ -467,20 +467,21 @@ then you can enable type promotion by assigning the value to a local variable:
 
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (getter-name)">
 ```dart
 import 'dart:math';
-
-class Example {
+// ···
+class D {
   final int? _overridden;
-  Example(this._overridden);
+  D(this._overridden);
 }
 
-class Override implements Example {
+class Override implements D {
   @override
   int? get _overridden => Random().nextBool() ? 1 : null;
 }
 
-f(Example x) {
+testD(D x) {
   final i = x._overridden;
   if (i != null) {
     print(i.isEven); // OK
@@ -536,19 +537,20 @@ If the field and the conflicting entity are truly unrelated,
 you can work around the problem by giving them different names:
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (unrelated)">
 ```dart
-class Example {
-  final int? _i;
-  Example(this._i);
+class A {
+  final int? _n;
+  A(this._n);
 }
-
+// ···
 class Unrelated {
   int? get _j => Random().nextBool() ? 1 : null;
 }
 
-f(Example x) {
-  if (x._i != null) {
-    int i = x._i; // OK
+f(A a) {
+  if (a._n != null) {
+    int i = a._n; // OK
   }
 }
 ```
@@ -596,18 +598,19 @@ If the fields are actually related and need to share a name, then you can
 enable type promotion by assigning the value to a final local variable to promote:
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (field-name)">
 ```dart
-class Example {
+class D {
   final int? _overridden;
-  Example(this._overridden);
+  D(this._overridden);
 }
-
-class Override implements Example {
+// ···
+class Override2 implements D {
   @override
   int? _overridden;
 }
 
-f(Example x) {
+test2(D x) {
   final i = x._overridden;
   if (i != null) {
     print(i.isEven); // ERROR
@@ -677,22 +680,23 @@ Define the getter in question so that `noSuchMethod` doesn't have
 to implicitly handle its implementation:
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (mock)">
 ```dart
 import 'package:mockito/mockito.dart';
-
-class Example {
-  final int? _i;
-  Example(this._i);
+// ···
+class A {
+  final int? _n;
+  A(this._n);
 }
-
-class MockExample extends Mock implements Example {
+// ···
+class MockExample extends Mock implements A {
   @override
-  late final int? _i; // Add a definition for Example's _i getter.
+  late final int? _n; // Add a definition for Example's _i getter.
 }
 
-f(Example x) {
-  if (x._i != null) {
-    int i = x._i; // OK
+testMock(A x) {
+  if (x._n != null) {
+    int i = x._n; // OK
   }
 }
 ```
@@ -910,7 +914,7 @@ The safest solution is to add a null check inside the `catch` block:
 {:.good}
 <?code-excerpt "non_promotion/lib/non_promotion.dart (catch-null-check)" replace="/if.*/[!$&!]/g;/(} else {|  \/\/ H.*)/[!$&!]/g;/  }/  [!}!]/g"?>
 ```dart
-// ···
+  // ...
 } catch (e) {
   [!if (i != null) {!]
     print(i.isEven); // (3) OK due to the null check in the line above.
@@ -925,7 +929,7 @@ just use the `!` operator:
 
 <?code-excerpt "non_promotion/lib/non_promotion.dart (catch-bang)" replace="/i!/i[!!!]/g"?>
 ```dart
-// ···
+  // ...
 } catch (e) {
   print(i[!!!].isEven); // (3) OK because of the `!`.
 }
