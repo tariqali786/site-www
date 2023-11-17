@@ -1,6 +1,9 @@
 // ignore_for_file: expected_executable, missing_statement
 // ignore_for_file: unused_local_variable, unused_element
 // ignore_for_file: prefer_function_declarations_over_variables
+// #docregion not-field
+import 'dart:math';
+// #enddocregion not-field
 
 class C1 {
   int? i;
@@ -242,3 +245,68 @@ void miscDeclAnalyzedButNotTested() {
     // #enddocregion closure-write-capture
   }
 }
+
+// #docregion this
+extension E on int? {
+  int get valueOrZero {
+    final self = this;
+    return self == null ? 0 : self;
+  }
+}
+// #enddocregion this
+
+// #docregion private
+class A {
+  final int? _n;
+  A(this._n);
+}
+
+test(A a) {
+  if (a._n != null) {
+    print(a._n + 1); // OK
+  }
+}
+// #enddocregion private
+
+// #docregion final
+class Example {
+  final int? _immutablePrivateField;
+  Example(this._immutablePrivateField);
+
+  f() {
+    if (_immutablePrivateField != null) {
+      int i = _immutablePrivateField; // OK
+    }
+  }
+}
+// #enddocregion final
+
+// #docregion not-field
+abstract class B {
+  int? get _i => Random().nextBool() ? 123 : null;
+}
+
+f(B b) {
+  final i = b._i;
+  if (i != null) {
+    print(i.isEven); // OK
+  }
+}
+// #enddocregion not-field
+
+// #docregion external
+class Ext {
+  external final int? _externalField;
+
+  f() {
+    final i = this._externalField;
+    if (i != null) {
+      print(i.isEven); // OK
+    }
+  }
+}
+// #enddocregion external
+
+// #docregion 
+
+// #enddocregion 

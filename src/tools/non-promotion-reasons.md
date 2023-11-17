@@ -195,10 +195,11 @@ extension E on int? {
 Create a local variable to hold the value of `this`, then perform the null check.
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (this)" replace="/final.*/[!$&!]/g"?>
 ```dart
 extension E on int? {
   int get valueOrZero {
-    final self = this;
+    [!final self = this;!]
     return self == null ? 0 : self;
   }
 }
@@ -219,14 +220,14 @@ non-private fields cannot be promoted.
 
 {:.bad}
 ```dart
-class C {
+class A {
   final int? n;
-  C(this.n);
+  A(this.n);
 }
 
-test(C c) {
-  if (c.n != null) {
-    print(c.n + 1); // ERROR
+test(A a) {
+  if (a.n != null) {
+    print(a.n + 1); // ERROR
   }
 }
 ```
@@ -243,15 +244,16 @@ Making the field private lets the compiler be sure that no outside libraries
 could possibly override its value, so it's safe to promote.
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (private)" replace="/final.*/[!$&!]/g"?>
 ```dart
-class C {
-  final int? _n;
-  C(this._n);
+class A {
+  [!final int? _n;!]
+  A(this._n);
 }
 
-test(C c) {
-  if (c._n != null) {
-    print(c._n + 1); // OK
+test(A a) {
+  if (a._n != null) {
+    print(a._n + 1); // OK
   }
 }
 ```
@@ -294,9 +296,10 @@ class C {
 Make the field `final`:
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (final)" replace="/final.*/[!$&!]/g"?>
 ```dart
 class Example {
-  final int? _immutablePrivateField; 
+  [!final int? _immutablePrivateField;!]
   Example(this._immutablePrivateField);
 
   f() {
@@ -343,15 +346,16 @@ f(C c) {
 Assign the getter to a local variable:
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (not-field)" replace="/final.*/[!$&!]/g"?>
 ```dart
 import 'dart:math';
-
-abstract class C {
+// ···
+abstract class B {
   int? get _i => Random().nextBool() ? 123 : null;
 }
 
-f(C c) {
-  final i = c._i;
+f(B b) {
+  [!final i = b._i;!]
   if (i != null) {
     print(i.isEven); // OK
   }
@@ -405,13 +409,13 @@ class C {
 Assign the external field's value to a local variable:
 
 {:.good}
+<?code-excerpt "non_promotion/lib/non_promotion.dart (external)" replace="/final.*/[!$&!]/g"?>
 ```dart
-class C {
-  external final int? _externalField;
-  C(this._externalField);
+class Ext {
+  external [!final int? _externalField;!]
 
   f() {
-    final i = this._externalField;
+    [!final i = this._externalField;!]
     if (i != null) {
       print(i.isEven); // OK
     }
