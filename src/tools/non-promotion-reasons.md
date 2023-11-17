@@ -177,7 +177,7 @@ you'd want to do a null check to see whether `this` is null:
 
 {:.bad}
 ```dart
-extension E on int? {
+extension Ext on int? {
   int get valueOrZero {
     return this == null ? 0 : this; // ERROR
   }
@@ -195,11 +195,11 @@ extension E on int? {
 Create a local variable to hold the value of `this`, then perform the null check.
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (this)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (this)" replace="/final.*/[!$&!]/g"?>
 ```dart
-extension E on int? {
+extension Ext on int? {
   int get valueOrZero {
-    final self = this;
+    [!final self = this;!]
     return self == null ? 0 : self;
   }
 }
@@ -220,14 +220,14 @@ non-private fields cannot be promoted.
 
 {:.bad}
 ```dart
-class A {
-  final int? n;
-  A(this.n);
+class Exampke {
+  final int? i;
+  Example(this.i);
 }
 
-test(A a) {
-  if (a.n != null) {
-    print(a.n + 1); // ERROR
+test(Example x) {
+  if (x.i != null) {
+    print(x.i + 1); // ERROR
   }
 }
 ```
@@ -235,7 +235,7 @@ test(A a) {
 **Message:**
 
 ```nocode
-'n' refers to a public field so it couldn’t be promoted.
+'i' refers to a public field so it couldn’t be promoted.
 ```
 
 **Solution:**
@@ -244,16 +244,16 @@ Making the field private lets the compiler be sure that no outside libraries
 could possibly override its value, so it's safe to promote.
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (private)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (private)" replace="/_i;/[!_i!];/g"?>
 ```dart
-class A {
-  final int? _n;
-  A(this._n);
+class Example {
+  final int? [!_i!];
+  Example(this._i);
 }
 
-testA(A a) {
-  if (a._n != null) {
-    print(a._n + 1); // OK
+test(Example x) {
+  if (x._i != null) {
+    print(x._i + 1); // OK
   }
 }
 ```
@@ -273,9 +273,9 @@ to a non-nullable type.
 
 {:.bad}
 ```dart
-class C {
+class A {
   int? _mutablePrivateField;
-  Example(this._mutablePrivateField);
+  A(this._mutablePrivateField);
 
   f() {
     if (_mutablePrivateField != null) {
@@ -288,7 +288,7 @@ class C {
 **Message:**
 
 ```nocode
-'mutablePrivateField' refers to a non-final field so it couldn’t be promoted.
+'_mutablePrivateField' refers to a non-final field so it couldn’t be promoted.
 ```
 
 **Solution:**
@@ -298,9 +298,9 @@ Make the field `final`:
 {:.good}
 <?code-excerpt "non_promotion/lib/non_promotion.dart (final)" replace="/final.*/[!$&!]/g"?>
 ```dart
-class Example {
+class A {
   [!final int? _immutablePrivateField;!]
-  Example(this._immutablePrivateField);
+  A(this._immutablePrivateField);
 
   f() {
     if (_immutablePrivateField != null) {
@@ -324,13 +324,13 @@ Because their stability can't be confirmed, getters are not safe to promote.
 ```dart
 import 'dart:math';
 
-abstract class C {
+abstract class B {
   int? get _i => Random().nextBool() ? 123 : null;
 }
 
-f(C c) {
-  if (c._i != null) {
-    print(c._i.isEven); // ERROR
+testB(B b) {
+  if (b._i != null) {
+    print(b._i.isEven); // ERROR
   }
 }
 ```
@@ -346,7 +346,7 @@ f(C c) {
 Assign the getter to a local variable:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (not-field)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (not-field)" replace="/final.*/[!$&!]/g"?>
 ```dart
 import 'dart:math';
 // ···
@@ -355,7 +355,7 @@ abstract class B {
 }
 
 testB(B b) {
-  final i = b._i;
+  [!final i = b._i;!]
   if (i != null) {
     print(i.isEven); // OK
   }
@@ -386,9 +386,8 @@ will return the same value each time it’s called.
 
 {:.bad}
 ```dart
-class C {
+class E {
   external final int? _externalField;
-  C(this._externalField);
 
   f() {
     if (_externalField != null) {
@@ -401,7 +400,7 @@ class C {
 **Message:**
 
 ```nocode
-'externalField' refers to an external field so it couldn’t be promoted.
+'_externalField' refers to an external field so it couldn’t be promoted.
 ```
 
 **Solution:**
@@ -409,13 +408,13 @@ class C {
 Assign the external field's value to a local variable:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (external)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (external)" replace="/final i =.*/[!$&!]/g"?>
 ```dart
-class Ext {
+class E {
   external final int? _externalField;
 
   f() {
-    final i = this._externalField;
+    [!final i = this._externalField;!]
     if (i != null) {
       print(i.isEven); // OK
     }
@@ -436,19 +435,19 @@ a concrete getter with the same name.
 ```dart
 import 'dart:math';
 
-class Example {
+class D {
   final int? _overridden;
-  Example(this._overridden);
+  D(this._overridden);
 }
 
-class Override implements Example {
+class Override implements D {
   @override
   int? get _overridden => Random().nextBool() ? 1 : null;
 }
 
-f(Example x) {
-  if (x._overridden != null) {
-    print(x._overridden.isEven); // ERROR
+testD(D d) {
+  if (d._overridden != null) {
+    print(d._overridden.isEven); // ERROR
   }
 }
 ```
@@ -456,7 +455,7 @@ f(Example x) {
 **Message:**
 
 ```nocode
-'overriden' couldn’t be promoted because there is a conflicting getter in class 'Override'
+'_overriden' couldn’t be promoted because there is a conflicting getter in class 'Override'
 ```
 
 **Solution**:
@@ -467,7 +466,7 @@ then you can enable type promotion by assigning the value to a local variable:
 
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (getter-name)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (getter-name)" replace="/final i =.*/[!$&!]/g"?>
 ```dart
 import 'dart:math';
 // ···
@@ -480,9 +479,9 @@ class Override implements D {
   @override
   int? get _overridden => Random().nextBool() ? 1 : null;
 }
-
-testD(D x) {
-  final i = x._overridden;
+// ···
+testD(D d) {
+  [!final i = d._overridden;!]
   if (i != null) {
     print(i.isEven); // OK
   }
@@ -537,20 +536,20 @@ If the field and the conflicting entity are truly unrelated,
 you can work around the problem by giving them different names:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (unrelated)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (unrelated)" replace="/get _j/[!$&!]/g"?>
 ```dart
-class A {
-  final int? _n;
-  A(this._n);
+class Example {
+  final int? _i;
+  Example(this._i);
 }
 // ···
 class Unrelated {
-  int? get _j => Random().nextBool() ? 1 : null;
+  int? [!get _j!] => Random().nextBool() ? 1 : null;
 }
-
-f(A a) {
-  if (a._n != null) {
-    int i = a._n; // OK
+// ···
+f(Example x) {
+  if (x._i != null) {
+    int i = x._i; // OK
   }
 }
 ```
@@ -566,19 +565,19 @@ a field with the same name that isn't promotable
 
 {:.bad}
 ```dart
-class Example {
+class D {
   final int? _overridden;
-  Example(this._overridden);
+  D(this._overridden);
 }
 
-class Override implements Example {
+class Override2 implements D {
   @override
   int? _overridden;
 }
 
-f(Example x) {
-  if (x._overridden != null) {
-    print(x._overridden.isEven); // ERROR
+testD(D d) {
+  if (d._overridden != null) {
+    print(d._overridden.isEven); // ERROR
   }
 }
 ```
@@ -589,7 +588,7 @@ instance of `Override`, so promotion would not be sound.
 **Message:**
 
 ```nocode
-'overridden' couldn’t be promoted because there is a conflicting non-promotable field in class 'Override'.
+'_overridden' couldn’t be promoted because there is a conflicting non-promotable field in class 'Override2'.
 ```
 
 **Solution:**
@@ -598,7 +597,7 @@ If the fields are actually related and need to share a name, then you can
 enable type promotion by assigning the value to a final local variable to promote:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (field-name)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (field-name)" replace="/final i =.*/[!$&!]/g"?>
 ```dart
 class D {
   final int? _overridden;
@@ -609,11 +608,11 @@ class Override2 implements D {
   @override
   int? _overridden;
 }
-
-test2(D x) {
-  final i = x._overridden;
+// ···
+testD(D d) {
+  [!final i = d._overridden;!]
   if (i != null) {
-    print(i.isEven); // ERROR
+    print(i.isEven); // OK
   }
 }
 ```
@@ -680,23 +679,23 @@ Define the getter in question so that `noSuchMethod` doesn't have
 to implicitly handle its implementation:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (mock)"?>
+<?code-excerpt "non_promotion/lib/non_promotion.dart (mock)" replace="/late.*/[!$&!]/g"?>
 ```dart
 import 'package:mockito/mockito.dart';
 // ···
-class A {
-  final int? _n;
-  A(this._n);
+class Example {
+  final int? _i;
+  Example(this._i);
 }
 // ···
-class MockExample extends Mock implements A {
+class MockExample extends Mock implements Example {
   @override
-  late final int? _n; // Add a definition for Example's _i getter.
+  [!late final int? _i;!]
 }
 
-testMock(A x) {
-  if (x._n != null) {
-    int i = x._n; // OK
+f(Example x) {
+  if (x._i != null) {
+    int i = x._i; // OK
   }
 }
 ```

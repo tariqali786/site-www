@@ -248,7 +248,7 @@ void miscDeclAnalyzedButNotTested() {
 }
 
 // #docregion this
-extension E on int? {
+extension Ext on int? {
   int get valueOrZero {
     final self = this;
     return self == null ? 0 : self;
@@ -257,23 +257,23 @@ extension E on int? {
 // #enddocregion this
 
 // #docregion private, unrelated, mock
-class A {
-  final int? _n;
-  A(this._n);
+class Example {
+  final int? _i;
+  Example(this._i);
 }
 // #enddocregion unrelated, mock
 
-testA(A a) {
-  if (a._n != null) {
-    print(a._n + 1); // OK
+test(Example x) {
+  if (x._i != null) {
+    print(x._i + 1); // OK
   }
 }
 // #enddocregion private
 
 // #docregion final
-class Example {
+class A {
   final int? _immutablePrivateField;
-  Example(this._immutablePrivateField);
+  A(this._immutablePrivateField);
 
   f() {
     if (_immutablePrivateField != null) {
@@ -297,7 +297,7 @@ testB(B b) {
 // #enddocregion not-field
 
 // #docregion external
-class Ext {
+class E {
   external final int? _externalField;
 
   f() {
@@ -320,54 +320,40 @@ class Override implements D {
   @override
   int? get _overridden => Random().nextBool() ? 1 : null;
 }
-
-testD(D x) {
-  final i = x._overridden;
-  if (i != null) {
-    print(i.isEven); // OK
-  }
-}
 // #enddocregion getter-name
-
-// #docregion unrelated
-class Unrelated {
-  int? get _j => Random().nextBool() ? 1 : null;
-}
-
-f(A a) {
-  if (a._n != null) {
-    int i = a._n; // OK
-  }
-}
-// #enddocregion unrelated
 
 // #docregion field-name
 class Override2 implements D {
   @override
   int? _overridden;
 }
-
-test2(D x) {
-  final i = x._overridden;
-  if (i != null) {
-    print(i.isEven); // ERROR
-  }
-}
 // #enddocregion field-name
 
-// #docregion mock
-class MockExample extends Mock implements A {
-  @override
-  late final int? _n; // Add a definition for Example's _i getter.
-}
-
-testMock(A x) {
-  if (x._n != null) {
-    int i = x._n; // OK
+// #docregion getter-name, field-name
+testD(D d) {
+  final i = d._overridden;
+  if (i != null) {
+    print(i.isEven); // OK
   }
 }
-// #enddocregion mock
+// #enddocregion getter-name, field-name
 
-// #docregion
+// #docregion unrelated
+class Unrelated {
+  int? get _j => Random().nextBool() ? 1 : null;
+}
+// #enddocregion unrelated
 
-// #enddocregion
+// #docregion mock
+class MockExample extends Mock implements Example {
+  @override
+  late final int? _i;
+}
+
+// #docregion unrelated
+f(Example x) {
+  if (x._i != null) {
+    int i = x._i; // OK
+  }
+}
+// #enddocregion mock, unrelated
