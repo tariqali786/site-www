@@ -195,7 +195,7 @@ extension E on int? {
 Create a local variable to hold the value of `this`, then perform the null check.
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (this)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (this)"?>
 ```dart
 extension E on int? {
   int get valueOrZero {
@@ -244,7 +244,7 @@ Making the field private lets the compiler be sure that no outside libraries
 could possibly override its value, so it's safe to promote.
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (private)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (private)"?>
 ```dart
 class A {
   final int? _n;
@@ -346,7 +346,7 @@ f(C c) {
 Assign the getter to a local variable:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (not-field)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (not-field)"?>
 ```dart
 import 'dart:math';
 // ···
@@ -409,7 +409,7 @@ class C {
 Assign the external field's value to a local variable:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (external)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (external)"?>
 ```dart
 class Ext {
   external final int? _externalField;
@@ -467,7 +467,7 @@ then you can enable type promotion by assigning the value to a local variable:
 
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (getter-name)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (getter-name)"?>
 ```dart
 import 'dart:math';
 // ···
@@ -537,7 +537,7 @@ If the field and the conflicting entity are truly unrelated,
 you can work around the problem by giving them different names:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (unrelated)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (unrelated)"?>
 ```dart
 class A {
   final int? _n;
@@ -598,7 +598,7 @@ If the fields are actually related and need to share a name, then you can
 enable type promotion by assigning the value to a final local variable to promote:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (field-name)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (field-name)"?>
 ```dart
 class D {
   final int? _overridden;
@@ -680,7 +680,7 @@ Define the getter in question so that `noSuchMethod` doesn't have
 to implicitly handle its implementation:
 
 {:.good}
-<?code-excerpt "non_promotion/lib/non_promotion.dart (mock)">
+<?code-excerpt "non_promotion/lib/non_promotion.dart (mock)"?>
 ```dart
 import 'package:mockito/mockito.dart';
 // ···
